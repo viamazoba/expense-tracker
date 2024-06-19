@@ -6,18 +6,21 @@ export type BudgetActions =
     { type: 'show-modal' } |
     { type: 'close-modal' } |
     { type: 'add-expense' , payload: { expense: DraftExpense }} |
-    { type: 'remove-expense', payload: {id: Expense['id']}}
+    { type: 'remove-expense', payload: {id: Expense['id']}} |
+    { type: 'get-expense-by-id', payload: {id: Expense['id']}}
 
 export type BudgetState = {
     budget: number
     modal: boolean
     expenses: Expense[]
+    editingId: Expense['id']
 }
 
 export const initialState: BudgetState = {
     budget: 0,
     modal: false,
-    expenses: []
+    expenses: [],
+    editingId: ''
 }
 
 const createExpense = (draftExpense: DraftExpense): Expense => {
@@ -49,16 +52,37 @@ export const budgetReducer = (
     if(action.type === 'close-modal') {
         return {
             ...state,
-            modal: false
+            modal: false,
+            editingId: ''
         }
     }
     
     if(action.type === 'add-expense') {
         const expense = createExpense(action.payload.expense)
-        return {
-            ...state,
-            expenses: [...state.expenses, expense ],
-            modal: false
+        if(!state.editingId) {
+            return {
+                ...state,
+                expenses: [...state.expenses, expense ],
+                modal: false
+            }
+        } else {
+            const newExpense = state.expenses.map(expense => {
+                if(expense.id === state.editingId) {
+                    return {
+                        ...action.payload.expense,
+                        id: state.editingId
+                    }
+                }
+
+                return expense
+            })
+
+            return {
+                ...state,
+                expenses: [...newExpense],
+                editingId: '',
+                modal: false
+            }
         }
     } 
 
@@ -67,6 +91,14 @@ export const budgetReducer = (
         return {
             ...state,
             expenses: [...newExpenses ]
+        }
+    }
+    
+    if(action.type === 'get-expense-by-id') {
+        return {
+            ...state,
+            editingId: action.payload.id,
+            modal: true
         }
     } 
 

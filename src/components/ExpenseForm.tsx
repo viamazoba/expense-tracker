@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { categories } from "../data/categories";
 import DatePicker from 'react-date-picker';
 import 'react-date-picker/dist/DatePicker.css'
@@ -18,7 +18,14 @@ export default function ExpenseForm() {
 
     const [ error, setError ] = useState('')
 
-    const { dispatch } = useBudget()
+    const { dispatch, state } = useBudget()
+
+    useEffect(()=> {
+        if(state.editingId){
+            const editingExpense = state.expenses.filter(expense => expense.id === state.editingId)[0]
+            setExpense(editingExpense)
+        }
+    }, [state.editingId])
 
     const handleChange = (e: ChangeEvent<HTMLInputElement|HTMLSelectElement>)=> {
         const newValue = e.target.id === 'amount' ? +e.target.value : e.target.value
@@ -56,7 +63,7 @@ export default function ExpenseForm() {
     return (
         <form className="space-y-5" onSubmit={ handleSubmit }>
             <legend className="uppercase text-center text-2xl font-black border-b-4 border-blue-500 py-2">
-                Nuevo Gasto
+                {state.editingId ? 'Guardar Cambios':'Nuevo Gasto'}
             </legend>
             {error && 
                 <ErrorMessage>
@@ -131,7 +138,7 @@ export default function ExpenseForm() {
             <input 
                 type="submit" 
                 className="bg-blue-600 cursor-pointer w-full p-2 text-white uppercase font-bold rounded-lg"
-                value={'Registrar Gasto'}
+                value={state.editingId?'Guardar Cambios':'Registrar Gasto'}
             />
         </form>
     )
