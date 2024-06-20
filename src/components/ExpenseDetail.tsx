@@ -49,7 +49,7 @@ export default function ExpenseDetail({
                 leadingActions={leadingActions()}
                 trailingActions={trailingActions()}
             >
-                <div className="flex items-center bg-white shadow-lg p-10 w-full border-b border-gray-200 gap-5">
+                <div className="flex items-center bg-white shadow-lg p-5 w-full border-b border-gray-200 gap-5">
                     <div>
 
                         <img 
